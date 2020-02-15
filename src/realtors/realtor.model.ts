@@ -1,13 +1,13 @@
-import * as mysql from 'mysql';
+// import * as mysql from 'mysql';
 
-export const RealtorSchema = new mysql.Schema({
-     id: { type: Number, required: true },
-     fistName: { type: String, required: true },
-     lastName: { type: String, required: true },
-     phone: { type: String, required: true },
-     addressId: { tyepe: Number, required: true },
-     createdDate: { tyepe: Date, required: true }
-});
+// export const RealtorSchema = new mysql.Schema({
+//      id: { type: Number, required: true },
+//      fistName: { type: String, required: true },
+//      lastName: { type: String, required: true },
+//      phone: { type: String, required: true },
+//      addressId: { tyepe: Number, required: true },
+//      createdDate: { tyepe: Date, required: true }
+// });
 
 export class Realtor {
 

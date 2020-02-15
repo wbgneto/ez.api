@@ -1,4 +1,6 @@
-import {TypeOrmModuleOptions} from '@nestjs/typeorm';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { api_realtor } from '../realtors/realtor.entity';
+// import { api_address } from '../addresses/address.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
@@ -7,6 +9,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     username: 'root',
     password: 'root',
     database: 'EZSystem',
-    entities: [__dirname + '/../**/*.entity.ts'],
-    synchronize: true
+    entities: [api_realtor],//[__dirname + '../**/*.entity.ts'],
+    synchronize: false,
 }
