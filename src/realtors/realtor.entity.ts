@@ -1,10 +1,10 @@
-import {Entity, Column, PrimaryColumn, OneToOne, JoinColumn} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn} from "typeorm";
 // import { api_address } from '../addresses/address.entity';
 
 @Entity()
 export class api_realtor {
 
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     // @OneToOne(type => api_address)

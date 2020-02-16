@@ -1,19 +1,18 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param, Put, Delete } from "@nestjs/common";
 import { RealtorsService } from "./realtors.service";
 
 @Controller('realtors')
 export class RealtorsController {
-    constructor(private readonly realtorsService: RealtorsService) {}
+    constructor(private realtorsService: RealtorsService) {}
 
     @Post()
     addRealtor(
-        @Body('firstname') realtorFirstName: string,
+        @Body('firstName') realtorFirstName: string,
         @Body('lastName') realtorLastName: string,
         @Body('phone') realtorPhone: string,
         @Body('addressId') realtorAddrId: number
     ) {
-        const generatedId = this.realtorsService.insertRealtor(realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
-        return generatedId;
+        this.realtorsService.insertRealtor(realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
     }
 
     @Get()
@@ -26,16 +25,16 @@ export class RealtorsController {
         return this.realtorsService.getSingleRealtor(realtorId);
     }
 
-    @Patch(':id')
+    @Put(':id')
     updateRealtor(
         @Param('id') realtorId: number, 
-        @Body('firstname') realtorFirstName: string,
+        @Body('firstName') realtorFirstName: string,
         @Body('lastName') realtorLastName: string,
         @Body('phone') realtorPhone: string,
         @Body('addressId') realtorAddrId: number
         ) {
-          this.realtorsService.updateRealtor(realtorId, realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
-          return null;  
+          return this.realtorsService.updateRealtor(realtorId, realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
+        
     }
 
     @Delete(':id')
