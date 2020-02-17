@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
 import { api_realtor  } from './realtor.entity';
-// import { IDGenerator } from '../config/IDGenetaror';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -20,8 +20,8 @@ export class RealtorsService {
         realtor.lastname = lastName;
         realtor.phone = phone;
         realtor.created_at = today;
-
         await this.realtorRepository.save(realtor);
+        
     }
 
     async getRealtors(): Promise<api_realtor[]> {

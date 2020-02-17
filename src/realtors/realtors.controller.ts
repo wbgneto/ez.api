@@ -1,9 +1,11 @@
-import { Controller, Post, Body, Get, Param, Put, Delete } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param, Put, Delete, Logger } from "@nestjs/common";
 import { RealtorsService } from "./realtors.service";
+import { validate } from 'class-validator';
 
 @Controller('realtors')
 export class RealtorsController {
     constructor(private realtorsService: RealtorsService) {}
+
 
     @Post()
     addRealtor(
@@ -12,7 +14,17 @@ export class RealtorsController {
         @Body('phone') realtorPhone: string,
         @Body('addressId') realtorAddrId: number
     ) {
-        this.realtorsService.insertRealtor(realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
+        const toValidate = {firstname: realtorFirstName, lastname: realtorLastName, phone: realtorPhone, addressId: realtorAddrId};
+        validate('RealtorSchema', toValidate).then(errors => {
+            if(errors.length > 0) {
+                Logger.log("Validation failed: " + errors);
+            } else {
+                Logger.log("validation succeed ");
+                this.realtorsService.insertRealtor(realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
+            }
+        }).catch(errors => {
+            throw errors;
+        });
     }
 
     @Get()
@@ -33,8 +45,17 @@ export class RealtorsController {
         @Body('phone') realtorPhone: string,
         @Body('addressId') realtorAddrId: number
         ) {
-          return this.realtorsService.updateRealtor(realtorId, realtorFirstName, realtorLastName, realtorPhone, realtorAddrId);
-        
+            const toValidate = {firstname: realtorFirstName, lastname: realtorLastName, phone: realtorPhone, addressId: realtorAddrId};
+            validate('RealtorSchema', toValidate).then(errors => {
+                if(errors.length > 0) {
+                    Logger.log("Validation failed: " + errors);
+                } else {
+                    Logger.log("validation succeed ");
+                    return this.realtorsService.updateRealtor(realtorId, realtorFirstName, realtorLastName, realtorPhone, realtorAddrId );
+                }
+            }).catch(errors => {
+                throw errors;
+            });
     }
 
     @Delete(':id')
