@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
-import { api_realtor  } from './realtor.entity';
+import { Realtor  } from './realtor.entity';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,44 +7,44 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class RealtorsService {
     constructor(
-        @InjectRepository(api_realtor )
-        private realtorRepository: Repository<api_realtor>,
+        @InjectRepository(Realtor )
+        private realtorRepository: Repository<Realtor>,
     ) {}
 
     
     async insertRealtor(firstName: string, lastName: string, phone: string, addressId: number) {
         const today = new Date();
-        let realtor = new api_realtor();
-        realtor.addr_id = addressId;
-        realtor.firstname = firstName;
-        realtor.lastname = lastName;
+        let realtor = new Realtor();
+        realtor.address_id = addressId;
+        realtor.first_name = firstName;
+        realtor.last_name = lastName;
         realtor.phone = phone;
         realtor.created_at = today;
         await this.realtorRepository.save(realtor);
         
     }
 
-    async getRealtors(): Promise<api_realtor[]> {
+    async getRealtors(): Promise<Realtor[]> {
          return await this.realtorRepository.find();
     }
 
-    async getSingleRealtor(realtorId: number): Promise<api_realtor> {
+    async getSingleRealtor(realtorId: number): Promise<Realtor> {
         return await this.findRealtor(realtorId);
     }
 
     async updateRealtor(realtorId: number, firstName: string, lastName: string, phone: string, addressId: number) {
         const realtorToUpdate = await this.findRealtor(realtorId);
         if(firstName) {
-            realtorToUpdate.firstname = firstName;
+            realtorToUpdate.first_name = firstName;
         }
         if(lastName) {
-            realtorToUpdate.lastname = lastName;
+            realtorToUpdate.last_name = lastName;
         }
         if(phone) {
             realtorToUpdate.phone = phone;
         }
         if(addressId) {
-            realtorToUpdate.addr_id = addressId;
+            realtorToUpdate.address_id = addressId;
         }
         await this.realtorRepository.update(realtorToUpdate.id, realtorToUpdate);
         return realtorToUpdate;
@@ -55,7 +55,7 @@ export class RealtorsService {
         await this.realtorRepository.remove(realtorToDelete);
     }
 
-    private async findRealtor(realtorId: number): Promise<api_realtor> {
+    private async findRealtor(realtorId: number): Promise<Realtor> {
         let realtor;
         try {
             realtor = await this.realtorRepository.findOne(realtorId);
