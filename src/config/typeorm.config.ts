@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { api_realtor } from '../realtors/realtor.entity';
+import { api_realtor } from '../modules/realtors/realtor.entity';
 // import { api_address } from '../addresses/address.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {

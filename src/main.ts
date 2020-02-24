@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 
 //To do the validation 
 import { registerSchema } from 'class-validator';
-import { realtorValidationSchema } from './realtors/realtor.pipe';
+import { realtorValidationSchema } from './modules/realtors/realtor.pipe';
 registerSchema(realtorValidationSchema);
 
 async function bootstrap() {
