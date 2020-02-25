@@ -1,6 +1,13 @@
 ### How to run
 
-If you have Docker, just run: `docker-compose up -d`  
+Run: `docker-compose up`  
 
-If you want to run in your own computer, use `npm run start`.  
-Make sure your node version is 12.14.1
+- Access application at: `localhost:3000`
+- PhpMyAdmin accessible at: `localhost:3001`
+
+### Without Docker
+
+If you want to run in your own computer, use `npm run start:dev`.  
+
+- Make sure your node version is 12.14.1
+- Change database connection info on `typeorm.config.ts`
