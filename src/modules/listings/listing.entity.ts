@@ -3,6 +3,7 @@ import {ListingType} from "./data/listingType.enum";
 import {ListingStatus} from "./data/listingStatus.enum";
 import {Feature} from "../features/feature.entity";
 import {Address} from "../addresses/address.entity";
+import {Photo} from "../photos/photo.entity";
 
 @Entity({name: 'listings'})
 export class Listing {
@@ -23,6 +24,11 @@ export class Listing {
         cascade: true
     })
     features: Feature[];
+
+    @OneToMany(type => Photo, photo => photo.listing, {
+        cascade: true
+    })
+    photos: Photo[];
 
     @Column({type: "enum", enum: ListingType})
     type: number;

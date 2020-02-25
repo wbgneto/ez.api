@@ -13,7 +13,7 @@ export class ListingsController {
 
     @Get()
     findAll() {
-        return this.listingRepository.find();
+        return this.listingRepository.find({ relations: [ 'photos', 'address', 'features']});
     }
 
     @Post()
