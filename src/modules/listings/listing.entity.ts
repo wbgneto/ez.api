@@ -1,24 +1,33 @@
-import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Unique, Index} from "typeorm";
 import {ListingType} from "./data/listingType.enum";
 import {ListingStatus} from "./data/listingStatus.enum";
+import {Feature} from "../features/feature.entity";
+import {Address} from "../addresses/address.entity";
 
-@Entity()
+@Entity({name: 'listings'})
 export class Listing {
     @PrimaryGeneratedColumn()
     id: number;
 
-    // @TODO - Relationship
-    @Column({ nullable: true })
-    address_id: number;
+    @OneToOne(type => Address, {
+        cascade: true
+    })
+    @JoinColumn()
+    address: Address;
 
     // @TODO - Relationship
-    @Column({ nullable: true })
+    @Column({nullable: true})
     realtor_id: number;
 
-    @Column({ type: "enum", enum: ListingType})
+    @OneToMany(type => Feature, feature => feature.listing, {
+        cascade: true
+    })
+    features: Feature[];
+
+    @Column({type: "enum", enum: ListingType})
     type: number;
 
-    @Column({ type: "enum", enum: ListingStatus})
+    @Column({type: "enum", enum: ListingStatus})
     status: number;
 
     @Column()
@@ -33,9 +42,9 @@ export class Listing {
     @Column()
     square_foot: number;
 
-    @Column({ nullable: true })
+    @Column({nullable: true})
     sold_at: Date;
 
-    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     created_at: Date;
 }

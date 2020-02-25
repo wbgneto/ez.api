@@ -23,13 +23,14 @@ export class ListingsController {
 
     @Put(':id')
     async update(@Param('id') listingId: number, @Body() data) {
-        const listing = await this.listingRepository.findOne(listingId);
+        let listing = await this.listingRepository.findOne(listingId);
 
         if (listing === undefined) {
             throw new NotFoundException();
         }
 
-        await this.listingRepository.update(listingId, data);
+        listing = await this.listingRepository.merge(listing, data);
+        await this.listingRepository.save(listing);
 
         return {
             status_code: 200,

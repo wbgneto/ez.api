@@ -1,6 +1,9 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Realtor } from '../modules/realtors/realtor.entity';
 import {Listing} from "../modules/listings/listing.entity";
+import {Realtor} from "../modules/realtors/realtor.entity";
+import {Feature} from "../modules/features/feature.entity";
+import {SnakeNamingStrategy} from "typeorm-naming-strategies";
+import {Address} from "../modules/addresses/address.entity";
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
@@ -9,6 +12,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     username: 'ezrealtors',
     password: 'ezrealtors',
     database: 'ezrealtors',
-    entities: [Realtor, Listing],//[__dirname + '../**/*.entity.ts'],
+    entities: [Listing, Realtor, Feature, Address],
     synchronize: true,
+    namingStrategy: new SnakeNamingStrategy()
 };

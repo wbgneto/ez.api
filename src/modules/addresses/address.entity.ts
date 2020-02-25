@@ -1,23 +1,32 @@
-import {Entity, Column, PrimaryColumn } from 'typeorm';
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {IsNotEmpty} from "class-validator";
 
-@Entity()
-export class api_address {
-    @PrimaryColumn()
+@Entity({ name: 'addresses' })
+export class Address {
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    address: string;
+    @IsNotEmpty()
+    street: string;
 
     @Column()
+    @IsNotEmpty()
+    number: string;
+
+    @Column()
+    @IsNotEmpty()
     postal_code: string;
 
     @Column()
+    @IsNotEmpty()
     city: string;
 
     @Column()
+    @IsNotEmpty()
     province: string;
 
     @Column()
-    lag_lang: string;
-
+    @IsNotEmpty()
+    country: string;
 }
