@@ -1,5 +1,7 @@
 version: '3'
+
 services:
+
   api:
     container_name: api
     image: node:12.14.1
@@ -13,6 +15,9 @@ services:
     tty: true
     depends_on:
       - db
+    networks:
+      - ez
+
   db:
     image: mysql:5.7
     restart: always
@@ -23,3 +28,23 @@ services:
       MYSQL_DATABASE: ezrealtors
       MYSQL_USER: ezrealtors
       MYSQL_PASSWORD: ezrealtors
+    networks:
+      - ez
+
+  pma:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '3001:80'
+    environment:
+      PMA_HOST: db
+      PMA_USER: ezrealtors
+      PMA_PASSWORD: ezrealtors
+      MYSQL_ROOT_PASSWORD: ezrealtors
+    networks:
+      - ez
+
+networks:
+  ez:
