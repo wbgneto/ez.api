@@ -7,10 +7,12 @@ import { registerSchema } from 'class-validator';
 import { realtorValidationSchema } from './modules/realtors/realtor.pipe';
 registerSchema(realtorValidationSchema);
 
+require('dotenv').config();
+
 async function bootstrap() {
   const app = await NestFactory.create(Modules);
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
-  Logger.log(`Server is running on http://localhost:3000`, 'Bootstrap');
+  await app.listen(process.env.APP_PORT);
+  Logger.log(`Server is running on http://localhost:${process.env.APP_PORT}`);
 }
 bootstrap();
