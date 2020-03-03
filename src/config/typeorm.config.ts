@@ -10,9 +10,9 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
     host: 'db',
     port: 3306,
-    username: 'ezrealtors',
-    password: 'ezrealtors',
-    database: 'ezrealtors',
+    username: 'easyrealtysystem',
+    password: 'easyrealtysystem!',
+    database: 'easyrealtysystem',
     entities: [Listing, Realtor, Feature, Address, Photo],
     synchronize: true,
     namingStrategy: new SnakeNamingStrategy()
