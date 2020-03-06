@@ -7,7 +7,9 @@ export class Feature {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Listing, listing => listing.features)
+    @ManyToOne(type => Listing, listing => listing.features, {
+        onDelete:'CASCADE'
+    })
     @JoinColumn({ name: 'listing_id', referencedColumnName: 'id' })
     listing: Listing;
 

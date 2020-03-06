@@ -11,7 +11,8 @@ export class Listing {
     id: number;
 
     @OneToOne(type => Address, {
-        cascade: true
+        cascade: true,
+        onDelete:'CASCADE'
     })
     @JoinColumn()
     address: Address;
@@ -21,12 +22,14 @@ export class Listing {
     realtor_id: number;
 
     @OneToMany(type => Feature, feature => feature.listing, {
-        cascade: true
+        cascade: true,
+        onDelete:'CASCADE'
     })
     features: Feature[];
 
     @OneToMany(type => Photo, photo => photo.listing, {
-        cascade: true
+        cascade: true,
+        onDelete:'CASCADE'
     })
     photos: Photo[];
 
