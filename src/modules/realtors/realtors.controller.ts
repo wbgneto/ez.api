@@ -1,5 +1,4 @@
 import { Controller, Post, Body, Get, Param, Put, Delete, Logger, NotFoundException } from "@nestjs/common";
-import { RealtorsService } from "./realtors.service";
 import { validate } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import {Repository} from "typeorm";
@@ -8,7 +7,6 @@ import { Realtor  } from './realtor.entity';
 @Controller('realtors')
 export class RealtorsController {
     constructor(
-        private realtorsService: RealtorsService,
         @InjectRepository(Realtor)
         private realtorRepository: Repository<Realtor>,
         ) {}
@@ -33,7 +31,6 @@ export class RealtorsController {
                 realtor.phone = realtorPhone;
                 realtor.created_at = today;
                 this.realtorRepository.save(realtor);
-                // this.realtorsService.insertRealtor(realtorFirstName, realtorLastName, realtorPhone);
             }
         }).catch(errors => {
             throw errors;
@@ -43,13 +40,11 @@ export class RealtorsController {
     @Get()
     async getAll() {
         return await this.realtorRepository.find();
-        // return this.realtorsService.getRealtors();
     }
 
     @Get(':id')
     async find(@Param('id') realtorId: number) {
         return await this.findRealtor(realtorId);
-        // return this.realtorsService.getSingleRealtor(realtorId);
     }
 
     @Put(':id')
@@ -76,7 +71,6 @@ export class RealtorsController {
     async remove(@Param('id') realtorId: number) {
         const realtorToDelete = await this.findRealtor(realtorId);
         await this.realtorRepository.remove(realtorToDelete);
-        // this.realtorsService.deleteRealtor(realtorId);
         return null;
     }
 
