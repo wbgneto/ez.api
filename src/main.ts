@@ -2,11 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { Modules } from './modules/modules';
 import {Logger, ValidationPipe} from '@nestjs/common';
 
-//To do the validation 
-import { registerSchema } from 'class-validator';
-import { realtorValidationSchema } from './modules/realtors/realtor.pipe';
-registerSchema(realtorValidationSchema);
-
 require('dotenv').config();
 
 async function bootstrap() {

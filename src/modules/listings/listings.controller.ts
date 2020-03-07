@@ -27,6 +27,21 @@ export class ListingsController {
         };
     }
 
+    @Get(':id')
+    async find(@Param('id') listingId: number) {
+        const listing = await this.listingRepository.findOne(listingId);
+
+        if (listing === undefined) {
+            throw new NotFoundException();
+        }
+
+        return {
+            status_code: 200,
+            message: 'Listing found',
+            data: listing,
+        };
+    }
+
     @Post()
     async create(@Body() requestData: CreateListingDto) {
         const listing = await this.listingRepository.save(requestData);

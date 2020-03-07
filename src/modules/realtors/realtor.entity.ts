@@ -6,14 +6,11 @@ export class Realtor {
     id: number;
 
     @Column()
-    first_name: string;
+    name: string;
 
-    @Column()
-    last_name: string;
-
-    @Column()
+    @Column({ nullable: true })
     phone: string;
 
-    @Column()
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     created_at: Date;
 }

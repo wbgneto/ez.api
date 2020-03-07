@@ -1,14 +1,11 @@
-import { IsNotEmpty, ValidateNested, IsPhoneNumber} from 'class-validator';
-import {Type} from "class-transformer";
+import {IsNotEmpty, IsOptional, IsPhoneNumber} from 'class-validator';
 
 
-export class createRealtorDto {
+export class CreateRealtorDto {
     @IsNotEmpty()
-    first_name: string;
-
-    @IsNotEmpty()
-    last_name: string;
+    name: string;
 
     @IsPhoneNumber("+1")
+    @IsOptional()
     phone: string;
 }
