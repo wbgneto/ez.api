@@ -18,7 +18,7 @@ export class ListingsController {
             query.title = Like(`%${query.title}%`);
         }
 
-        const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features'], where: query});
+        const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features', 'realtor'], where: query});
 
         return {
             status_code: 200,
@@ -29,7 +29,7 @@ export class ListingsController {
 
     @Get(':id')
     async find(@Param('id') listingId: number) {
-        const listing = await this.listingRepository.findOne(listingId);
+        const listing = await this.listingRepository.findOne(listingId, {relations: [ 'photos', 'address', 'features', 'realtor']});
 
         if (listing === undefined) {
             throw new NotFoundException();

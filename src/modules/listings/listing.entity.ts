@@ -4,6 +4,7 @@ import {ListingStatus} from "./data/listingStatus.enum";
 import {Feature} from "../features/feature.entity";
 import {Address} from "../addresses/address.entity";
 import {Photo} from "../photos/photo.entity";
+import {Realtor} from "../realtors/realtor.entity";
 
 @Entity({name: 'listings'})
 export class Listing {
@@ -17,9 +18,11 @@ export class Listing {
     @JoinColumn()
     address: Address;
 
-    // @TODO - Relationship
-    @Column({nullable: true})
-    realtor_id: number;
+    @OneToOne(type => Realtor, {
+        cascade: true,
+    })
+    @JoinColumn()
+    realtor: Realtor;
 
     @OneToMany(type => Feature, feature => feature.listing, {
         cascade: true,
