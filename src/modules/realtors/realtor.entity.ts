@@ -5,11 +5,6 @@ export class Realtor {
     @PrimaryGeneratedColumn()
     id: number;
 
-    // @OneToOne(type => api_address)
-    // @JoinColumn()
-    @Column()
-    address_id: number;
-
     @Column()
     first_name: string;
 
