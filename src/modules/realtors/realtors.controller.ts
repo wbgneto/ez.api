@@ -1,6 +1,6 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from "@nestjs/common";
+import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from "typeorm";
+import {Like, Repository} from "typeorm";
 import {Realtor} from './realtor.entity';
 import {CreateRealtorDto} from "./data/createRealtor.dto";
 import {UpdateRealtorDto} from "./data/updateRealtor.dto";
@@ -14,8 +14,14 @@ export class RealtorsController {
     }
 
     @Get()
-    async getAll() {
-        const realtors = await this.realtorRepository.find();
+    async getAll(@Query() query) {
+        const where:any = {};
+
+        if (query.name) {
+            where.name = Like(`%${query.name}%`);
+        }
+
+        const realtors = await this.realtorRepository.find({ where });
 
         return {
             status_code: 200,

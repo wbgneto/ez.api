@@ -14,11 +14,13 @@ export class ListingsController {
 
     @Get()
     async findAll(@Query() query) {
+        const where:any = {};
+
         if (query.title) {
-            query.title = Like(`%${query.title}%`);
+            where.title = Like(`%${query.title}%`);
         }
 
-        const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features', 'realtor'], where: query});
+        const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features', 'realtor'], where });
 
         return {
             status_code: 200,
