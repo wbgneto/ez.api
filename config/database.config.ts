@@ -5,6 +5,7 @@ import {Feature} from "../src/modules/features/feature.entity";
 import {SnakeNamingStrategy} from "typeorm-naming-strategies";
 import {Address} from "../src/modules/addresses/address.entity";
 import {Photo} from "../src/modules/photos/photo.entity";
+import {User} from "../src/modules/users/user.entity";
 
 require('dotenv').config();
 
@@ -15,7 +16,7 @@ export const database: TypeOrmModuleOptions = {
     username: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
-    entities: [Listing, Realtor, Feature, Address, Photo],
+    entities: [User, Listing, Realtor, Feature, Address, Photo],
     synchronize: true,
     namingStrategy: new SnakeNamingStrategy()
 };
