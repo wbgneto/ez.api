@@ -28,28 +28,32 @@ export class ReportsController {
         const showBy = query.showBy; // Quantity or SUM of amount
 
         // Return last 12 months of sales
-        return [
-            {
-                ids: [1],
-                label: 'Object 1',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                ids: [2],
-                label: 'Object 2',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                ids: [3],
-                label: 'Object 3',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                ids: [4,5,6],
-                label: 'Others',
-                value: Math.round(Math.random() * 10)
-            }
-        ];
+        return {
+            status_code: 200,
+            message: 'Listing found',
+            data: [
+                {
+                    ids: [1],
+                    label: 'Object 1',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    ids: [2],
+                    label: 'Object 2',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    ids: [3],
+                    label: 'Object 3',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    ids: [4,5,6],
+                    label: 'Others',
+                    value: Math.round(Math.random() * 10)
+                }
+            ],
+        };
     }
 
     /**
@@ -65,47 +69,51 @@ export class ReportsController {
         const showBy = query.showBy; // Quantity or SUM of amount
 
         // Return last 12 months of sales
-        return [
-            {
-                label: 'Mar 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Apr 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'May 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Jun 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Jul 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Aug 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Sep 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Oct 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Nov 19',
-                value: Math.round(Math.random() * 10)
-            },
-            {
-                label: 'Dec 19',
-                value: Math.round(Math.random() * 10)
-            }
-        ];
+        return {
+            status_code: 200,
+            message: 'Listing found',
+            data:  [
+                {
+                    label: 'Mar 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Apr 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'May 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Jun 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Jul 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Aug 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Sep 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Oct 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Nov 19',
+                    value: Math.round(Math.random() * 10)
+                },
+                {
+                    label: 'Dec 19',
+                    value: Math.round(Math.random() * 10)
+                }
+            ]
+        };
     }
 }
