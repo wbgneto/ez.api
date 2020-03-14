@@ -1,5 +1,8 @@
 export enum ListingType {
-    House,
+    Detached,
     Townhouse,
-    Building
+    Condo,
+    SemiDetached,
+    Duplex,
+    Triplex
 }
