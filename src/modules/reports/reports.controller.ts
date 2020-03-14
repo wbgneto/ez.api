@@ -30,7 +30,7 @@ export class ReportsController {
         // Return last 12 months of sales
         return {
             status_code: 200,
-            message: 'Listing found',
+            message: 'Report retrieved successfully',
             data: [
                 {
                     ids: [1],
@@ -71,7 +71,7 @@ export class ReportsController {
         // Return last 12 months of sales
         return {
             status_code: 200,
-            message: 'Listing found',
+            message: 'Report retrieved successfully',
             data:  [
                 {
                     label: 'Mar 19',
