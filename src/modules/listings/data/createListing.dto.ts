@@ -1,8 +1,9 @@
-import {IsArray, IsEnum, IsNotEmpty, ValidateNested} from 'class-validator';
+import {IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, ValidateNested} from 'class-validator';
 import {ListingType} from "./listingType.enum";
 import {Feature} from "../../features/feature.entity";
 import {Address} from "../../addresses/address.entity";
 import {Type} from "class-transformer";
+import {Realtor} from "../../realtors/realtor.entity";
 
 export class CreateListingDto {
     @IsNotEmpty()
@@ -11,6 +12,8 @@ export class CreateListingDto {
     @IsNotEmpty()
     @IsEnum(ListingType)
     type: number;
+
+    realtor;
 
     @IsNotEmpty()
     title: string;

@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Unique, Index} from "typeorm";
+import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 import {ListingType} from "./data/listingType.enum";
 import {ListingStatus} from "./data/listingStatus.enum";
 import {Feature} from "../features/feature.entity";
@@ -18,9 +18,7 @@ export class Listing {
     @JoinColumn()
     address: Address;
 
-    @OneToOne(type => Realtor, {
-        cascade: true,
-    })
+    @ManyToOne(type => Realtor, realtor => realtor.listings)
     @JoinColumn()
     realtor: Realtor;
 

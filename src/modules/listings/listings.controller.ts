@@ -1,15 +1,32 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query,
+    UploadedFiles,
+    UseInterceptors
+} from '@nestjs/common';
 import {Listing} from "./listing.entity";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Like, Repository} from "typeorm";
 import {CreateListingDto} from "./data/createListing.dto";
 import {UpdateListingDto} from "./data/updateListing.dto";
+import {FilesInterceptor} from "@nestjs/platform-express";
+import {Realtor} from "../realtors/realtor.entity";
 
 @Controller('listings')
 export class ListingsController {
     constructor(
         @InjectRepository(Listing)
         private readonly listingRepository: Repository<Listing>,
+        @InjectRepository(Realtor)
+        private readonly realtorRepository: Repository<Realtor>,
     ) {}
 
     @Get()
@@ -50,6 +67,16 @@ export class ListingsController {
 
     @Post()
     async create(@Body() requestData: CreateListingDto) {
+        if (requestData.realtor) {
+            const realtor = await this.realtorRepository.findOne(requestData.realtor);
+
+            if (!realtor) {
+                throw new BadRequestException("Realtor doest not exists");
+            }
+
+            requestData.realtor = realtor;
+        }
+
         const listing = await this.listingRepository.save(requestData);
 
         return {
