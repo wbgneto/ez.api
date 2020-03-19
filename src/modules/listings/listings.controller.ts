@@ -19,6 +19,8 @@ import {CreateListingDto} from "./data/createListing.dto";
 import {UpdateListingDto} from "./data/updateListing.dto";
 import {FilesInterceptor} from "@nestjs/platform-express";
 import {Realtor} from "../realtors/realtor.entity";
+import {multerOptions} from "../../../config/upload.config";
+import {Photo} from "../photos/photo.entity";
 
 @Controller('listings')
 export class ListingsController {
@@ -82,6 +84,31 @@ export class ListingsController {
         return {
             status_code: 200,
             message: "Listing created successfully",
+            data: listing
+        };
+    }
+
+    @Post('/:id/upload')
+    @UseInterceptors(FilesInterceptor('files', null, multerOptions))
+    async upload(@Param('id') listingId: number, @UploadedFiles() files) {
+        let listing = await this.listingRepository.findOne(listingId);
+
+        if (listing === undefined) {
+            throw new NotFoundException();
+        }
+
+        listing.photos = files.map(file => {
+            const photo = new Photo();
+            photo.path = file.path;
+
+            return photo;
+        });
+
+        listing = await this.listingRepository.save(listing);
+
+        return {
+            status_code: 200,
+            message: "Photo(s) uploaded succesfully",
             data: listing
         };
     }

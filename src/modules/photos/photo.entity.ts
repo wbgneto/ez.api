@@ -12,7 +12,4 @@ export class Photo {
 
     @Column()
     path: string;
-
-    @Column()
-    title: string;
 }
