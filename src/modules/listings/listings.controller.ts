@@ -20,6 +20,10 @@ export class ListingsController {
             where.title = Like(`%${query.title}%`);
         }
 
+        if (query.status) {
+            where.status = query.status;
+        }
+
         const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features', 'realtor'], where });
 
         return {
