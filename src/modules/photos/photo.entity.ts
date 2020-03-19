@@ -7,7 +7,7 @@ export class Photo {
     id: number;
 
     @ManyToOne(type => Listing, listing => listing.photos)
-    @JoinColumn({ name: 'listing_id', referencedColumnName: 'id' })
+    // @JoinColumn({ name: 'listing_id', referencedColumnName: 'id' })
     listing: Listing;
 
     @Column()
