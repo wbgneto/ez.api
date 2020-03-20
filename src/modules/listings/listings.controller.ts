@@ -8,7 +8,7 @@ import {
     Param,
     Post,
     Put,
-    Query,
+    Query, Res,
     UploadedFiles,
     UseInterceptors
 } from '@nestjs/common';
@@ -29,6 +29,8 @@ export class ListingsController {
         private readonly listingRepository: Repository<Listing>,
         @InjectRepository(Realtor)
         private readonly realtorRepository: Repository<Realtor>,
+        @InjectRepository(Photo)
+        private readonly photoRepository: Repository<Photo>,
     ) {}
 
     @Get()
@@ -88,7 +90,7 @@ export class ListingsController {
         };
     }
 
-    @Post('/:id/upload')
+    @Post('/:id/photos')
     @UseInterceptors(FilesInterceptor('files', null, multerOptions))
     async upload(@Param('id') listingId: number, @UploadedFiles() files) {
         let listing = await this.listingRepository.findOne(listingId);
@@ -100,16 +102,50 @@ export class ListingsController {
         listing.photos = files.map(file => {
             const photo = new Photo();
             photo.path = file.path;
+            photo.filename = file.filename;
 
             return photo;
         });
 
         listing = await this.listingRepository.save(listing);
 
+        // Hide photo path on response
+        listing.photos = listing.photos.map(photo => {
+            delete photo.path;
+            return photo;
+        });
+
         return {
             status_code: 200,
             message: "Photo(s) uploaded succesfully",
             data: listing
+        };
+    }
+
+    @Get('photos/:name')
+    async findPhoto(@Param('name') fileName: number, @Res() response) {
+        const photo = await this.photoRepository.findOne({ where: { filename: fileName}});
+
+        if (photo === undefined) {
+            throw new NotFoundException();
+        }
+
+        return response.sendFile(photo.path, { root: './' });
+    }
+
+    @Delete('/:id/photos/:photoId')
+    async destroyPhoto(@Param('id') listingId, @Param('id') photoId) {
+        const photo = await this.photoRepository.findOne(photoId, {where: {listing_id: listingId}});
+
+        if (photo === undefined) {
+            throw new NotFoundException();
+        }
+
+        await this.photoRepository.delete(photoId);
+
+        return {
+            status_code: 200,
+            message: "Photo deleted successfully",
         };
     }
 

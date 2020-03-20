@@ -1,5 +1,6 @@
 import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Listing} from "../listings/listing.entity";
+import {Exclude} from "class-transformer";
 
 @Entity({ name: 'photos' })
 export class Photo {
@@ -11,5 +12,9 @@ export class Photo {
     listing: Listing;
 
     @Column()
+    filename: string;
+
+    @Column()
+    @Exclude()
     path: string;
 }
