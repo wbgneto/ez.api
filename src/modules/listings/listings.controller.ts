@@ -113,6 +113,10 @@ export class ListingsController {
             throw new NotFoundException();
         }
 
+        if (!files || files.length === 0) {
+            throw new BadRequestException("No files received");
+        }
+
         listing.photos = files.map(file => {
             const photo = new Photo();
             photo.path = file.path;
