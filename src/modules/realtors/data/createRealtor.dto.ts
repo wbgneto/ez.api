@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsOptional, IsPhoneNumber} from 'class-validator';
+import {IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber} from 'class-validator';
 
 
 export class CreateRealtorDto {
@@ -6,6 +6,10 @@ export class CreateRealtorDto {
     name: string;
 
     @IsPhoneNumber("+1")
+    @IsOptional()
+    phone: string;
+
+    @IsEmail()
     @IsOptional()
     phone: string;
 }

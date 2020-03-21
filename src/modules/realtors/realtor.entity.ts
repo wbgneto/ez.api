@@ -7,6 +7,9 @@ export class Realtor {
     id: number;
 
     @Column()
+    email: string;
+
+    @Column()
     name: string;
 
     @Column({ nullable: true })
