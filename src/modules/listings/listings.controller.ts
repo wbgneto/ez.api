@@ -46,7 +46,7 @@ export class ListingsController {
         }
 
         if (query.realtor_id) {
-            where.realtor_id = query.realtor_id;
+            where.realtor = query.realtor_id;
         }
 
         const listings = await this
