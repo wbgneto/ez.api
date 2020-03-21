@@ -45,7 +45,21 @@ export class ListingsController {
             where.status = query.status;
         }
 
-        const listings = await this.listingRepository.find({ relations: [ 'photos', 'address', 'features', 'realtor'], where });
+        if (query.realtor_id) {
+            where.realtor_id = query.realtor_id;
+        }
+
+        const listings = await this
+            .listingRepository
+            .find(
+                {
+                    relations: [ 'photos', 'address', 'features', 'realtor'],
+                    where,
+                    order: {
+                        id: "DESC"
+                    }
+                }
+            );
 
         return {
             status_code: 200,
