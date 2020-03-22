@@ -107,7 +107,7 @@ export class ListingsController {
     @Post('/:id/photos')
     @UseInterceptors(FilesInterceptor('files', null, multerOptions))
     async upload(@Param('id') listingId: number, @UploadedFiles() files) {
-        let listing = await this.listingRepository.findOne(listingId, {relations: 'photos'});
+        let listing = await this.listingRepository.findOne(listingId, {relations: ['photos']});
 
         if (listing === undefined) {
             throw new NotFoundException();
