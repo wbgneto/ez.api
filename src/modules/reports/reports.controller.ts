@@ -1,6 +1,6 @@
 import {Controller, Get, Query} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from "typeorm";
+import {Repository, getRepository, createQueryBuilder, getConnection} from "typeorm";
 import {Listing} from "../listings/listing.entity";
 import {Realtor} from "../realtors/realtor.entity";
 
@@ -27,33 +27,107 @@ export class ReportsController {
         const endDate = query.end_date;
         const showBy = query.showBy; // Quantity or SUM of amount
 
-        // Return last 12 months of sales
-        return {
-            status_code: 200,
-            message: 'Report retrieved successfully',
-            data: [
-                {
-                    ids: [1],
-                    label: 'Object 1',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [2],
-                    label: 'Object 2',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [3],
-                    label: 'Object 3',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [4,5,6],
-                    label: 'Others',
-                    value: Math.round(Math.random() * 10)
+        if(showBy == "revenue") {
+
+            if(entityType == 'realtors'){
+                
+                const realtor = await getConnection()
+                            .createQueryBuilder()
+                            .select(["SUM(listing.price) AS price","realtor.id","realtor.name"])
+                            .from(Listing, "listing")
+                            .innerJoinAndSelect("listing.realtor", "realtor")
+                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .groupBy("listing.realtor.id")
+                            .getRawMany();
+
+                console.log(realtor);
+                let realtorInfo =[];
+                for (let i=0; i<realtor.length; i++){
+                    realtorInfo.push( 
+                        {
+                            id : realtor[i].id,
+                            label: realtor[i].name,
+                            value: realtor[i].price
+                        }
+                    );
                 }
-            ],
-        };
+                return realtorInfo;
+           
+            } else if(entityType == 'houses') {
+        
+                const listings = await getRepository(Listing)
+                            .createQueryBuilder("listing")
+                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .getMany();
+                console.log(listings);
+                let listingInfo =[];
+                for (let i=0; i<listings.length; i++){
+                    listingInfo.push( 
+                        {
+                            id : listings[i].id,
+                            label: listings[i].title,
+                            value: listings[i].price
+                        }
+                    );
+                }
+                return listingInfo;
+    
+            } else {
+                console.log('Please Select either "realtors" or "houses" you are looking for!');
+            }
+            
+        } else if(showBy == "quantity") {
+
+            if(entityType == 'realtors'){
+                
+                const realtor = await getConnection()
+                .createQueryBuilder()
+                .select(["COUNT(listing.price) AS listingcount","realtor.id","realtor.name"])
+                .from(Listing, "listing")
+                .innerJoinAndSelect("listing.realtor", "realtor")
+                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .groupBy("listing.realtor.id")
+                .getRawMany();
+
+                console.log(realtor);
+                let realtorInfo =[];
+                for (let i=0; i<realtor.length; i++){
+                    realtorInfo.push( 
+                        {
+                            id : realtor[i].id,
+                            label: realtor[i].name,
+                            value: realtor[i].listingcount
+                        }
+                    );
+                }
+                return realtorInfo;
+           
+            } else if(entityType == 'houses') {
+        
+                const listings = await getRepository(Listing)
+                            .createQueryBuilder("listing")
+                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})//{ startDate: startDate, endDate:endDate })
+                            .getMany();
+                console.log(listings);
+                let listingInfo =[];
+                for (let i=0; i<listings.length; i++){
+                    listingInfo.push( 
+                        {
+                            id : listings[i].id,
+                            label: listings[i].title,
+                            value: 1
+                        }
+                    );
+                }
+                return listingInfo;
+    
+            } else {
+                console.log('Please Select either "realtors" or "houses" you are looking for!');
+            }
+           
+        } else {
+            console.log("Please Define either 'revenue' or 'quantity' in your showBy!");
+        }
     }
 
     /**
