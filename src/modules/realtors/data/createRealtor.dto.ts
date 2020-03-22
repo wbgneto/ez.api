@@ -11,5 +11,5 @@ export class CreateRealtorDto {
 
     @IsEmail()
     @IsOptional()
-    phone: string;
+    email: string;
 }
