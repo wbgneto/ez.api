@@ -157,7 +157,7 @@ export class ListingsController {
     }
 
     @Delete('/:id/photos/:photoId')
-    async destroyPhoto(@Param('id') listingId, @Param('id') photoId) {
+    async destroyPhoto(@Param('id') listingId, @Param('photoId') photoId) {
         const photo = await this.photoRepository.findOne(photoId, {where: {listing_id: listingId}});
 
         if (photo === undefined) {
