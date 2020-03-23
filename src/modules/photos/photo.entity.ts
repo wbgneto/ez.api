@@ -7,7 +7,7 @@ export class Photo {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(type => Listing, listing => listing.photos)
+    @ManyToOne(type => Listing, listing => listing.photos, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'listing_id', referencedColumnName: 'id' })
     listing: Listing;
 
