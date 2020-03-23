@@ -76,6 +76,8 @@ export class ListingsController {
             throw new NotFoundException();
         }
 
+        listing.features = listing.features.sort((a, b) => a.type - b.type);
+
         return {
             status_code: 200,
             message: 'Listing found',
@@ -107,7 +109,7 @@ export class ListingsController {
     @Post('/:id/photos')
     @UseInterceptors(FilesInterceptor('files', null, multerOptions))
     async upload(@Param('id') listingId: number, @UploadedFiles() files) {
-        let listing = await this.listingRepository.findOne(listingId);
+        let listing = await this.listingRepository.findOne(listingId, {relations: ['photos']});
 
         if (listing === undefined) {
             throw new NotFoundException();
@@ -117,13 +119,18 @@ export class ListingsController {
             throw new BadRequestException("No files received");
         }
 
-        listing.photos = files.map(file => {
+        const newPhotos: Photo[] = files.map(file => {
             const photo = new Photo();
             photo.path = file.path;
             photo.filename = file.filename;
 
             return photo;
         });
+
+        listing.photos = [
+            ...listing.photos,
+            ...newPhotos
+        ];
 
         listing = await this.listingRepository.save(listing);
 
@@ -152,7 +159,7 @@ export class ListingsController {
     }
 
     @Delete('/:id/photos/:photoId')
-    async destroyPhoto(@Param('id') listingId, @Param('id') photoId) {
+    async destroyPhoto(@Param('id') listingId, @Param('photoId') photoId) {
         const photo = await this.photoRepository.findOne(photoId, {where: {listing_id: listingId}});
 
         if (photo === undefined) {
