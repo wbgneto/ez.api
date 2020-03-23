@@ -56,16 +56,44 @@ export class ReportsController {
             } else if(entityType == 'houses') {
         
                 const listings = await getRepository(Listing)
-                            .createQueryBuilder("listing")
+                            .createQueryBuilder()
+                            .select(["SUM(listing.price) AS price" ,"listing.type" ])
+                            .from(Listing, "listing")
                             .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
-                            .getMany();
-                console.log(listings);
+                            .groupBy("listing.type")
+                            .getRawMany();
+                // console.log(listings);
                 let listingInfo =[];
                 for (let i=0; i<listings.length; i++){
+                    let label;
+                    console.log(listings[i].listing_type);
+                    switch(listings[i].listing_type) {
+                        case '0' : 
+                            label = "Detached";
+                            break;
+                        case '1' : 
+                            label = "Townhouse";
+                            break;
+                        case '2' :
+                            label = "Condo";
+                            break;
+                        case '3' : 
+                            label = "SemiDetached";
+                            break;
+                        case '4' :
+                            label = "Duplex";
+                            break;
+                        case '5' :
+                            label = "Triplex";
+                            break;
+                        default:
+                            label = "Other";
+                            break;
+                    } ;
                     listingInfo.push( 
                         {
-                            id : listings[i].id,
-                            label: listings[i].title,
+                            id : listings[i].listing_type,
+                            label:label,
                             value: listings[i].price
                         }
                     );
@@ -105,17 +133,45 @@ export class ReportsController {
             } else if(entityType == 'houses') {
         
                 const listings = await getRepository(Listing)
-                            .createQueryBuilder("listing")
-                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})//{ startDate: startDate, endDate:endDate })
-                            .getMany();
-                console.log(listings);
+                .createQueryBuilder()
+                .select(["COUNT(listing.type) AS typecount" ,"listing.type" ])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .groupBy("listing.type")
+                .getRawMany();
+                // console.log(listings);
                 let listingInfo =[];
                 for (let i=0; i<listings.length; i++){
+                    let label;
+                    // console.log(listings[i].listing_type);
+                    switch(listings[i].listing_type) {
+                        case '0' : 
+                            label = "Detached";
+                            break;
+                        case '1' : 
+                            label = "Townhouse";
+                            break;
+                        case '2' :
+                            label = "Condo";
+                            break;
+                        case '3' : 
+                            label = "SemiDetached";
+                            break;
+                        case '4' :
+                            label = "Duplex";
+                            break;
+                        case '5' :
+                            label = "Triplex";
+                            break;
+                        default:
+                            label = "Other";
+                            break;
+                    } ;
                     listingInfo.push( 
                         {
-                            id : listings[i].id,
-                            label: listings[i].title,
-                            value: 1
+                            id : listings[i].listing_type,
+                            label:label,
+                            value: listings[i].typecount
                         }
                     );
                 }
