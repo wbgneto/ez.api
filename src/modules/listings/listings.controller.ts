@@ -76,7 +76,7 @@ export class ListingsController {
             throw new NotFoundException();
         }
 
-        listing.features = listing.features.sort(feature => feature.type);
+        listing.features = listing.features.sort((a, b) => a.type - b.type);
 
         return {
             status_code: 200,
