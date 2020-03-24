@@ -240,6 +240,17 @@ export class ReportsController {
         const showBy = query.showBy; // Quantity or SUM of amount
 
         const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
+        console.log(entityId);
+        let ids ;
+        if(entityId) {
+            ids = entityId.split(',');
+        } else {
+            ids = null;
+        }
+        
+        console.log(typeof entityId);
+        console.log(ids);
+        console.log(typeof ids);
 
         if( showBy == 'revenue' ) {
 
@@ -269,12 +280,11 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" , "listing.id"])
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.id IN (...:rid) AND listing.sold_at > :oneyear", {rid:entityId, oneyear: oneYearAgo})
+                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
-                .addGroupBy("listing.id")
                 .getRawMany();
                 
                 console.log(allsales);
@@ -294,13 +304,11 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "listing.realtor.id" ])
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)"])
                 .from(Listing, "listing")
-                .innerJoinAndSelect("listing.realtor", "realtor")
-                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:entityId, oneyear: oneYearAgo})
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
-                .addGroupBy("listing.realtor.id")
                 .getRawMany();
     
                 let overallsale = [];
@@ -346,12 +354,11 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" , "listing.id"])
+                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:entityId, oneyear: oneYearAgo})
+                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
-                .addGroupBy("listing.id")
                 .getRawMany();
                 
                 console.log(allsales);
@@ -372,13 +379,11 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "listing.realtor.id" ])
+                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)" ])
                 .from(Listing, "listing")
-                .innerJoinAndSelect("listing.realtor", "realtor")
-                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:entityId, oneyear: oneYearAgo})
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
-                .addGroupBy("listing.realtor.id")
                 .getRawMany();
     
                 let overallsale = [];
