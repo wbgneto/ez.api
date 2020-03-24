@@ -3,6 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository, getRepository, createQueryBuilder, getConnection} from "typeorm";
 import {Listing} from "../listings/listing.entity";
 import {Realtor} from "../realtors/realtor.entity";
+import * as moment from 'moment'
 
 @Controller('reports')
 export class ReportsController {
@@ -40,7 +41,6 @@ export class ReportsController {
                             .groupBy("listing.realtor.id")
                             .getRawMany();
 
-                console.log(realtor);
                 let realtorInfo =[];
                 for (let i=0; i<realtor.length; i++){
                     realtorInfo.push( 
@@ -51,7 +51,19 @@ export class ReportsController {
                         }
                     );
                 }
-                return realtorInfo;
+
+                let sortedrealtor = realtorInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedrealtor.splice(0,3);
+                console.log(sortedrealtor);
+                let others = sortedrealtor.splice(4);
+                others = sortedrealtor.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedrealtor.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
            
             } else if(entityType == 'houses') {
         
@@ -65,7 +77,6 @@ export class ReportsController {
                 let listingInfo =[];
                 for (let i=0; i<listings.length; i++){
                     let label;
-                    console.log(listings[i].listing_type);
                     switch(listings[i].listing_type) {
                         case '0' : 
                             label = "Detached";
@@ -97,7 +108,18 @@ export class ReportsController {
                         }
                     );
                 }
-                return listingInfo;
+                
+                let sortedlisting = listingInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedlisting.splice(0,3);
+                let others = sortedlisting.splice(4);
+                others = sortedlisting.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedlisting.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
     
             } else {
                 throw 'Please Select either "realtors" or "houses" you are looking for!';
@@ -116,7 +138,6 @@ export class ReportsController {
                 .groupBy("listing.realtor.id")
                 .getRawMany();
 
-                console.log(realtor);
                 let realtorInfo =[];
                 for (let i=0; i<realtor.length; i++){
                     realtorInfo.push( 
@@ -127,7 +148,19 @@ export class ReportsController {
                         }
                     );
                 }
-                return realtorInfo;
+                
+                let sortedrealtor = realtorInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedrealtor.splice(0,3);
+                console.log(sortedrealtor);
+                let others = sortedrealtor.splice(4);
+                others = sortedrealtor.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedrealtor.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
            
             } else if(entityType == 'houses') {
         
@@ -172,7 +205,18 @@ export class ReportsController {
                         }
                     );
                 }
-                return listingInfo;
+                let sortedlisting = listingInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedlisting.splice(0,3);
+                console.log(sortedlisting);
+                let others = sortedlisting.splice(4);
+                others = sortedlisting.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedlisting.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
     
             } else {
                 throw 'Please Select either "realtors" or "houses" you are looking for!';
@@ -195,6 +239,8 @@ export class ReportsController {
         const entityId = query.id;
         const showBy = query.showBy; // Quantity or SUM of amount
 
+        const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
+
         if( showBy == 'revenue' ) {
 
             if (entityType == null) {
@@ -203,7 +249,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" ])
                 .from(Listing, "listing")
-                .where("listing.status='2'")
+                .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .getRawMany();
@@ -225,7 +271,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" , "listing.id"])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.id = :rid", {rid:entityId})
+                .where("listing.status='2' AND listing.id IN (...:rid) AND listing.sold_at > :oneyear", {rid:entityId, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .addGroupBy("listing.id")
@@ -251,7 +297,7 @@ export class ReportsController {
                 .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "listing.realtor.id" ])
                 .from(Listing, "listing")
                 .innerJoinAndSelect("listing.realtor", "realtor")
-                .where("listing.status='2' AND listing.realtor.id= :rid", {rid:entityId})
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:entityId, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .addGroupBy("listing.realtor.id")
@@ -280,7 +326,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["COUNT(DISTINCT(listing.id)) AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" ])
                 .from(Listing, "listing")
-                .where("listing.status='2'")
+                .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .getRawMany();
@@ -302,7 +348,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" , "listing.id"])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.id = :rid", {rid:entityId})
+                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:entityId, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .addGroupBy("listing.id")
@@ -323,12 +369,13 @@ export class ReportsController {
 
             } else if (entityType == 'realtors') {
 
+
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
                 .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "listing.realtor.id" ])
                 .from(Listing, "listing")
                 .innerJoinAndSelect("listing.realtor", "realtor")
-                .where("listing.status='2' AND listing.realtor.id= :rid", {rid:entityId})
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:entityId, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .addGroupBy("listing.realtor.id")
