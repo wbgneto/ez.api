@@ -1,9 +1,10 @@
 import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
-import {Like, Repository} from "typeorm";
+import {getConnection, Like, Repository} from "typeorm";
 import {Realtor} from './realtor.entity';
 import {CreateRealtorDto} from "./data/createRealtor.dto";
 import {UpdateRealtorDto} from "./data/updateRealtor.dto";
+import {Listing} from "../listings/listing.entity";
 
 @Controller('realtors')
 export class RealtorsController {
@@ -81,6 +82,14 @@ export class RealtorsController {
         if (realtor === undefined) {
             throw new NotFoundException();
         }
+
+        // Remove listings from that realtor
+        await getConnection()
+            .createQueryBuilder()
+            .update(Listing)
+            .set({ realtor: null })
+            .where("realtor_id = :realtorId", { realtorId })
+            .execute();
 
         await this.realtorRepository.delete(realtorId);
 
