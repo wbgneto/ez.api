@@ -1,8 +1,9 @@
 import {Controller, Get, Query} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from "typeorm";
+import {Repository, getRepository, createQueryBuilder, getConnection} from "typeorm";
 import {Listing} from "../listings/listing.entity";
 import {Realtor} from "../realtors/realtor.entity";
+import * as moment from 'moment'
 
 @Controller('reports')
 export class ReportsController {
@@ -27,33 +28,203 @@ export class ReportsController {
         const endDate = query.end_date;
         const showBy = query.showBy; // Quantity or SUM of amount
 
-        // Return last 12 months of sales
-        return {
-            status_code: 200,
-            message: 'Report retrieved successfully',
-            data: [
-                {
-                    ids: [1],
-                    label: 'Object 1',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [2],
-                    label: 'Object 2',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [3],
-                    label: 'Object 3',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    ids: [4,5,6],
-                    label: 'Others',
-                    value: Math.round(Math.random() * 10)
+        if(showBy == "revenue") {
+
+            if(entityType == 'realtors'){
+                
+                const realtor = await getConnection()
+                            .createQueryBuilder()
+                            .select(["SUM(listing.price) AS price","realtor.id","realtor.name"])
+                            .from(Listing, "listing")
+                            .innerJoinAndSelect("listing.realtor", "realtor")
+                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .groupBy("listing.realtor.id")
+                            .getRawMany();
+
+                let realtorInfo =[];
+                for (let i=0; i<realtor.length; i++){
+                    realtorInfo.push( 
+                        {
+                            id : realtor[i].id,
+                            label: realtor[i].name,
+                            value: realtor[i].price
+                        }
+                    );
                 }
-            ],
-        };
+
+                let sortedrealtor = realtorInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedrealtor.splice(0,3);
+                console.log(sortedrealtor);
+                let others = sortedrealtor.splice(4);
+                others = sortedrealtor.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedrealtor.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
+           
+            } else if(entityType == 'houses') {
+        
+                const listings = await getRepository(Listing)
+                            .createQueryBuilder()
+                            .select(["SUM(listing.price) AS price" ,"listing.type" ])
+                            .from(Listing, "listing")
+                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .groupBy("listing.type")
+                            .getRawMany();
+                let listingInfo =[];
+                for (let i=0; i<listings.length; i++){
+                    let label;
+                    switch(listings[i].listing_type) {
+                        case '0' : 
+                            label = "Detached";
+                            break;
+                        case '1' : 
+                            label = "Townhouse";
+                            break;
+                        case '2' :
+                            label = "Condo";
+                            break;
+                        case '3' : 
+                            label = "SemiDetached";
+                            break;
+                        case '4' :
+                            label = "Duplex";
+                            break;
+                        case '5' :
+                            label = "Triplex";
+                            break;
+                        default:
+                            label = "Other";
+                            break;
+                    } ;
+                    listingInfo.push( 
+                        {
+                            id : listings[i].listing_type,
+                            label:label,
+                            value: listings[i].price
+                        }
+                    );
+                }
+                
+                let sortedlisting = listingInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedlisting.splice(0,3);
+                let others = sortedlisting.splice(4);
+                others = sortedlisting.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedlisting.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
+    
+            } else {
+                throw 'Please Select either "realtors" or "houses" you are looking for!';
+            }
+            
+        } else if(showBy == "quantity") {
+
+            if(entityType == 'realtors'){
+                
+                const realtor = await getConnection()
+                .createQueryBuilder()
+                .select(["COUNT(DISTINCT(listing.id)) AS listingcount","realtor.id","realtor.name"])
+                .from(Listing, "listing")
+                .innerJoinAndSelect("listing.realtor", "realtor")
+                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .groupBy("listing.realtor.id")
+                .getRawMany();
+
+                let realtorInfo =[];
+                for (let i=0; i<realtor.length; i++){
+                    realtorInfo.push( 
+                        {
+                            id : realtor[i].id,
+                            label: realtor[i].name,
+                            value: realtor[i].listingcount
+                        }
+                    );
+                }
+                
+                let sortedrealtor = realtorInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedrealtor.splice(0,3);
+                console.log(sortedrealtor);
+                let others = sortedrealtor.splice(4);
+                others = sortedrealtor.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedrealtor.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
+           
+            } else if(entityType == 'houses') {
+        
+                const listings = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["COUNT(DISTINCT(listing.type)) AS typecount" ,"listing.type" ])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .groupBy("listing.type")
+                .getRawMany();
+                let listingInfo =[];
+                for (let i=0; i<listings.length; i++){
+                    let label;
+                    switch(listings[i].listing_type) {
+                        case '0' : 
+                            label = "Detached";
+                            break;
+                        case '1' : 
+                            label = "Townhouse";
+                            break;
+                        case '2' :
+                            label = "Condo";
+                            break;
+                        case '3' : 
+                            label = "SemiDetached";
+                            break;
+                        case '4' :
+                            label = "Duplex";
+                            break;
+                        case '5' :
+                            label = "Triplex";
+                            break;
+                        default:
+                            label = "Other";
+                            break;
+                    } ;
+                    listingInfo.push( 
+                        {
+                            id : listings[i].listing_type,
+                            label:label,
+                            value: listings[i].typecount
+                        }
+                    );
+                }
+                let sortedlisting = listingInfo.sort((a, b) => (a.value > b.value) ? -1 : 1);
+                let top3 = sortedlisting.splice(0,3);
+                console.log(sortedlisting);
+                let others = sortedlisting.splice(4);
+                others = sortedlisting.reduce((total, next) => {   
+                    return parseInt(total) + parseInt(next.value);
+                }, 0);
+                return [top3, {
+                    id: sortedlisting.map( el => el.id),
+                    label: "Others",
+                    value: others
+                }];
+    
+            } else {
+                throw 'Please Select either "realtors" or "houses" you are looking for!';
+            }
+           
+        } else {
+            throw "Please Define either 'revenue' or 'quantity' in your showBy!";
+        }
     }
 
     /**
@@ -68,52 +239,219 @@ export class ReportsController {
         const entityId = query.id;
         const showBy = query.showBy; // Quantity or SUM of amount
 
-        // Return last 12 months of sales
-        return {
-            status_code: 200,
-            message: 'Report retrieved successfully',
-            data:  [
-                {
-                    label: 'Mar 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Apr 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'May 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Jun 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Jul 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Aug 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Sep 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Oct 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Nov 19',
-                    value: Math.round(Math.random() * 10)
-                },
-                {
-                    label: 'Dec 19',
-                    value: Math.round(Math.random() * 10)
+        const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
+        console.log(entityId);
+        let ids ;
+        if(entityId) {
+            ids = entityId.split(',');
+        } else {
+            ids = null;
+        }
+        
+        console.log(typeof entityId);
+        console.log(ids);
+        console.log(typeof ids);
+
+        if( showBy == 'revenue' ) {
+
+            if (entityType == null) {
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" ])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+    
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].price
+                    });
                 }
-            ]
-        };
+                return overallsale;
+
+            } else if ( entityType == 'houses' ) {
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+                
+                console.log(allsales);
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].price
+                    });
+                }
+                console.log(overallsale);
+                return overallsale;
+
+            } else if (entityType == 'realtors') {
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)"])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+    
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].price
+                    });
+                }
+                return overallsale;
+
+            } else {
+                throw 'Please define an entity Type!';
+            }
+
+        } else if ( showBy == 'quantity') {
+
+            if (entityType == null) {
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["COUNT(DISTINCT(listing.id)) AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" ])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+    
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].count
+                    });
+                }
+                return overallsale;
+
+            } else if ( entityType == 'houses' ) {
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+                
+                console.log(allsales);
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].count
+                    });
+                }
+                console.log(overallsale);
+                return overallsale;
+
+            } else if (entityType == 'realtors') {
+
+
+                const allsales = await getRepository(Listing)
+                .createQueryBuilder()
+                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)" ])
+                .from(Listing, "listing")
+                .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
+                .groupBy("year")
+                .addGroupBy("month")
+                .getRawMany();
+    
+                let overallsale = [];
+                console.log(allsales);
+                for(let i=0; i< allsales.length; i++) {
+                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    overallsale.push({
+                        label: label,
+                        value: allsales[i].count
+                    });
+                }
+                return overallsale;
+
+            } else {
+                throw 'Please define an entity Type!';
+            }
+
+        } else {
+            throw "Please Define either 'revenue' or 'quantity' in your showBy!";
+        }
+       
+
+        // Return last 12 months of sales
+        // return {
+        //     status_code: 200,
+        //     message: 'Report retrieved successfully',
+        //     data:  [
+        //         {
+        //             label: 'Mar 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Apr 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'May 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Jun 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Jul 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Aug 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Sep 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Oct 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Nov 19',
+        //             value: Math.round(Math.random() * 10)
+        //         },
+        //         {
+        //             label: 'Dec 19',
+        //             value: Math.round(Math.random() * 10)
+        //         }
+        //     ]
+        // };
     }
 }
