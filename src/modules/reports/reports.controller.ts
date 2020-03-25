@@ -45,7 +45,7 @@ export class ReportsController {
                 for (let i=0; i<realtor.length; i++){
                     realtorInfo.push( 
                         {
-                            id : realtor[i].id,
+                            id : [realtor[i].id],
                             label: realtor[i].name,
                             value: realtor[i].price
                         }
@@ -59,11 +59,15 @@ export class ReportsController {
                 others = sortedrealtor.reduce((total, next) => {   
                     return parseInt(total) + parseInt(next.value);
                 }, 0);
-                return [top3, {
-                    id: sortedrealtor.map( el => el.id),
-                    label: "Others",
-                    value: others
-                }];
+                let realtorlist = top3;
+                if(others) {
+                    realtorlist.push({
+                        id: sortedrealtor.map( el => parseInt((el.id).toString())),
+                        label: "Others",
+                        value: others
+                    });
+                }
+                return realtorlist;
            
             } else if(entityType == 'houses') {
         
@@ -102,7 +106,7 @@ export class ReportsController {
                     } ;
                     listingInfo.push( 
                         {
-                            id : listings[i].listing_type,
+                            id : [listings[i].listing_type],
                             label:label,
                             value: listings[i].price
                         }
@@ -115,11 +119,15 @@ export class ReportsController {
                 others = sortedlisting.reduce((total, next) => {   
                     return parseInt(total) + parseInt(next.value);
                 }, 0);
-                return [top3, {
-                    id: sortedlisting.map( el => el.id),
-                    label: "Others",
-                    value: others
-                }];
+                let realtorlist = top3;
+                if(others) {
+                    realtorlist.push({
+                        id: sortedlisting.map( el => parseInt((el.id).toString())),
+                        label: "Others",
+                        value: others
+                    });
+                }
+                return realtorlist;
     
             } else {
                 throw 'Please Select either "realtors" or "houses" you are looking for!';
@@ -142,7 +150,7 @@ export class ReportsController {
                 for (let i=0; i<realtor.length; i++){
                     realtorInfo.push( 
                         {
-                            id : realtor[i].id,
+                            id : [realtor[i].id],
                             label: realtor[i].name,
                             value: realtor[i].listingcount
                         }
@@ -156,11 +164,15 @@ export class ReportsController {
                 others = sortedrealtor.reduce((total, next) => {   
                     return parseInt(total) + parseInt(next.value);
                 }, 0);
-                return [top3, {
-                    id: sortedrealtor.map( el => el.id),
-                    label: "Others",
-                    value: others
-                }];
+                let realtorlist = top3;
+                if(others) {
+                    realtorlist.push({
+                        id: sortedrealtor.map( el => parseInt((el.id).toString())),
+                        label: "Others",
+                        value: others
+                    });
+                }
+                return realtorlist;
            
             } else if(entityType == 'houses') {
         
@@ -199,7 +211,7 @@ export class ReportsController {
                     } ;
                     listingInfo.push( 
                         {
-                            id : listings[i].listing_type,
+                            id : [listings[i].listing_type],
                             label:label,
                             value: listings[i].typecount
                         }
@@ -212,11 +224,15 @@ export class ReportsController {
                 others = sortedlisting.reduce((total, next) => {   
                     return parseInt(total) + parseInt(next.value);
                 }, 0);
-                return [top3, {
-                    id: sortedlisting.map( el => el.id),
-                    label: "Others",
-                    value: others
-                }];
+                let realtorlist = top3;
+                if(others) {
+                    realtorlist.push({
+                        id: sortedlisting.map( el => parseInt((el.id).toString())),
+                        label: "Others",
+                        value: others
+                    });
+                }
+                return realtorlist;
     
             } else {
                 throw 'Please Select either "realtors" or "houses" you are looking for!';
