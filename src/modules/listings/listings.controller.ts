@@ -56,7 +56,7 @@ export class ListingsController {
                     relations: [ 'photos', 'address', 'features', 'realtor'],
                     where,
                     order: {
-                        id: "DESC"
+                        created_at: "DESC"
                     }
                 }
             );
