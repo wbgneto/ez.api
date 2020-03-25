@@ -37,7 +37,7 @@ export class ReportsController {
                             .select(["SUM(listing.price) AS price","realtor.id","realtor.name"])
                             .from(Listing, "listing")
                             .innerJoinAndSelect("listing.realtor", "realtor")
-                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .where("listing.status='2' AND listing.sold_at BETWEEN :start AND :end", {start: startDate, end:endDate})
                             .groupBy("listing.realtor.id")
                             .getRawMany();
 
@@ -77,7 +77,7 @@ export class ReportsController {
                             .createQueryBuilder()
                             .select(["SUM(listing.price) AS price" ,"listing.type" ])
                             .from(Listing, "listing")
-                            .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                            .where("listing.status='2' AND listing.sold_at BETWEEN :start AND :end", {start: startDate, end:endDate})
                             .groupBy("listing.type")
                             .getRawMany();
                 let listingInfo =[];
@@ -144,7 +144,7 @@ export class ReportsController {
                 .select(["COUNT(DISTINCT(listing.id)) AS listingcount","realtor.id","realtor.name"])
                 .from(Listing, "listing")
                 .innerJoinAndSelect("listing.realtor", "realtor")
-                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .where("listing.status='2' AND listing.sold_at BETWEEN :start AND :end", {start: startDate, end:endDate})
                 .groupBy("listing.realtor.id")
                 .getRawMany();
 
@@ -182,7 +182,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["COUNT(DISTINCT(listing.id)) AS typecount" ,"listing.type" ])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
+                .where("listing.status='2' AND listing.sold_at BETWEEN :start AND :end", {start: startDate, end:endDate})
                 .groupBy("listing.type")
                 .getRawMany();
                 let listingInfo =[];
@@ -288,7 +288,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -311,7 +311,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -334,7 +334,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3)+ ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -362,7 +362,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
@@ -385,7 +385,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
@@ -411,7 +411,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
