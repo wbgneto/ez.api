@@ -47,7 +47,7 @@ export class ReportsController {
                         {
                             id : [realtor[i].id],
                             label: realtor[i].name,
-                            value: realtor[i].price
+                            value: parseInt(realtor[i].price)
                         }
                     );
                 }
@@ -56,6 +56,7 @@ export class ReportsController {
                 let top3 = sortedrealtor.splice(0,3);
                 console.log(sortedrealtor);
                 let others = sortedrealtor.splice(4);
+                
                 others = sortedrealtor.reduce((total, next) => {   
                     return parseInt(total) + parseInt(next.value);
                 }, 0);
@@ -67,6 +68,7 @@ export class ReportsController {
                         value: others
                     });
                 }
+                console.log("this is others"+ others);
                 return realtorlist;
            
             } else if(entityType == 'houses') {
@@ -108,7 +110,7 @@ export class ReportsController {
                         {
                             id : [listings[i].listing_type],
                             label:label,
-                            value: listings[i].price
+                            value: parseInt(listings[i].price)
                         }
                     );
                 }
@@ -152,7 +154,7 @@ export class ReportsController {
                         {
                             id : [realtor[i].id],
                             label: realtor[i].name,
-                            value: realtor[i].listingcount
+                            value: parseInt(realtor[i].listingcount)
                         }
                     );
                 }
@@ -178,7 +180,7 @@ export class ReportsController {
         
                 const listings = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["COUNT(DISTINCT(listing.type)) AS typecount" ,"listing.type" ])
+                .select(["COUNT(DISTINCT(listing.id)) AS typecount" ,"listing.type" ])
                 .from(Listing, "listing")
                 .where("listing.status='2' AND listing.created_at BETWEEN :start AND :end", {start: startDate, end:endDate})
                 .groupBy("listing.type")
@@ -213,7 +215,7 @@ export class ReportsController {
                         {
                             id : [listings[i].listing_type],
                             label:label,
-                            value: listings[i].typecount
+                            value: parseInt(listings[i].typecount)
                         }
                     );
                 }
@@ -253,14 +255,15 @@ export class ReportsController {
     {
         const entityType = query.type;
         const entityId = query.id;
-        const showBy = query.showBy; // Quantity or SUM of amount
+        const showBy = query.display; // Quantity or SUM of amount
 
         const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
         console.log(entityId);
-        let eid = entityId.substr(1).slice(0, -1);
+        
       
         let ids ;
         if(entityId) {
+            let eid = entityId.substr(1).slice(0, -1);
             ids = eid.split(',');
         } else {
             ids = null;
@@ -397,12 +400,14 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)" ])
+                .select(["COUNT(DISTINCT(listing.id))  AS count" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month" ])
                 .from(Listing, "listing")
                 .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .getRawMany();
+                console.log('--------------------------------------');
+                console.log(allsales);
     
                 let overallsale = [];
                 console.log(allsales);
