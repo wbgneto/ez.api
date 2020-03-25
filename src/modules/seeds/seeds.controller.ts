@@ -24,11 +24,11 @@ export class SeedsController {
 
     @Get('/')
     async seed() {
-        const realtors = await Promise.all([...Array(10)].map(async () => {
+        const realtors = await Promise.all([...Array(5)].map(async () => {
             return this.realtorRepository.save(this.makeRealtor());
         }));
 
-        const listings = await Promise.all([...Array(100)].map(async () => {
+        const listings = await Promise.all([...Array(500)].map(async () => {
             return this.listingRepository.save(this.makeListing(realtors));
         }));
 
