@@ -303,7 +303,7 @@ export class ReportsController {
                 .createQueryBuilder()
                 .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
                 .from(Listing, "listing")
-                .where("listing.status='2' AND listing.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
+                .where("listing.status='2' AND listing.type IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
                 .getRawMany();
