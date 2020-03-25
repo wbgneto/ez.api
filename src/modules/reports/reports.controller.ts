@@ -257,9 +257,11 @@ export class ReportsController {
 
         const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
         console.log(entityId);
+        let eid = entityId.substr(1).slice(0, -1);
+      
         let ids ;
         if(entityId) {
-            ids = entityId.split(',');
+            ids = eid.split(',');
         } else {
             ids = null;
         }
