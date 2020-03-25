@@ -1,4 +1,4 @@
-import {Controller, Get, Query} from "@nestjs/common";
+import {BadRequestException, Controller, Get, Query} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository, getRepository, createQueryBuilder, getConnection} from "typeorm";
 import {Listing} from "../listings/listing.entity";
@@ -26,9 +26,9 @@ export class ReportsController {
         const entityType = query.type;
         const startDate = query.start_date;
         const endDate = query.end_date;
-        const showBy = query.showBy; // Quantity or SUM of amount
+        const display = query.display; // Quantity or SUM of amount
 
-        if(showBy == "revenue") {
+        if(display == "revenue") {
 
             if(entityType == 'realtors'){
                 
@@ -132,10 +132,10 @@ export class ReportsController {
                 return realtorlist;
     
             } else {
-                throw 'Please Select either "realtors" or "houses" you are looking for!';
+                throw new BadRequestException('Please Select either "realtors" or "houses" you are looking for!');
             }
             
-        } else if(showBy == "quantity") {
+        } else if(display == "quantity") {
 
             if(entityType == 'realtors'){
                 
@@ -237,11 +237,11 @@ export class ReportsController {
                 return realtorlist;
     
             } else {
-                throw 'Please Select either "realtors" or "houses" you are looking for!';
+                throw new BadRequestException('Please Select either "realtors" or "houses" you are looking for!');
             }
            
         } else {
-            throw "Please Define either 'revenue' or 'quantity' in your showBy!";
+            throw new BadRequestException("Please Define either 'revenue' or 'quantity' in your display!");
         }
     }
 
@@ -255,8 +255,7 @@ export class ReportsController {
     {
         const entityType = query.type;
         const entityId = query.id;
-        const showBy = query.display; // Quantity or SUM of amount
-
+        const display = query.display; // Quantity or SUM of amount
         const oneYearAgo = moment().subtract(1, 'year').format('YYYY-MM-DD');
         console.log(entityId);
         
@@ -273,7 +272,7 @@ export class ReportsController {
         console.log(ids);
         console.log(typeof ids);
 
-        if( showBy == 'revenue' ) {
+        if( display == 'revenue' ) {
 
             if (entityType == null) {
 
@@ -344,10 +343,10 @@ export class ReportsController {
                 return overallsale;
 
             } else {
-                throw 'Please define an entity Type!';
+                throw new BadRequestException('Please define an entity Type!');
             }
 
-        } else if ( showBy == 'quantity') {
+        } else if ( display == 'quantity') {
 
             if (entityType == null) {
 
@@ -421,60 +420,11 @@ export class ReportsController {
                 return overallsale;
 
             } else {
-                throw 'Please define an entity Type!';
+                throw new BadRequestException('Please define an entity Type!');
             }
 
         } else {
-            throw "Please Define either 'revenue' or 'quantity' in your showBy!";
+            throw new BadRequestException("Please Define either 'revenue' or 'quantity' in your display!");
         }
-       
-
-        // Return last 12 months of sales
-        // return {
-        //     status_code: 200,
-        //     message: 'Report retrieved successfully',
-        //     data:  [
-        //         {
-        //             label: 'Mar 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Apr 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'May 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Jun 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Jul 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Aug 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Sep 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Oct 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Nov 19',
-        //             value: Math.round(Math.random() * 10)
-        //         },
-        //         {
-        //             label: 'Dec 19',
-        //             value: Math.round(Math.random() * 10)
-        //         }
-        //     ]
-        // };
     }
 }
