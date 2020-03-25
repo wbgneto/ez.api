@@ -99,7 +99,7 @@ export class RealtorsController {
     async getAvatar(@Param('id') realtorId: number, @Res() response) {
         const realtor = await this.realtorRepository.findOne(realtorId);
 
-        if (realtor === undefined) {
+        if (realtor === undefined || !realtor.avatar) {
             throw new NotFoundException();
         }
 
