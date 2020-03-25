@@ -1,10 +1,24 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query} from "@nestjs/common";
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+    Put,
+    Query, Res, UploadedFile,
+    UseInterceptors
+} from "@nestjs/common";
 import {InjectRepository} from '@nestjs/typeorm';
 import {getConnection, Like, Repository} from "typeorm";
 import {Realtor} from './realtor.entity';
 import {CreateRealtorDto} from "./data/createRealtor.dto";
 import {UpdateRealtorDto} from "./data/updateRealtor.dto";
 import {Listing} from "../listings/listing.entity";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {multerOptions} from "../../../config/upload.config";
 
 @Controller('realtors')
 export class RealtorsController {
@@ -55,6 +69,41 @@ export class RealtorsController {
             message: "Realtor created successfully",
             data: realtor
         };
+    }
+
+    @Post('/:id/avatar')
+    @UseInterceptors(FileInterceptor('avatar', multerOptions))
+    async setAvatar(@Param('id') realtorId: number, @UploadedFile() avatar) {
+        let realtor = await this.realtorRepository.findOne(realtorId);
+
+        if (realtor === undefined) {
+            throw new NotFoundException();
+        }
+
+        if (!avatar) {
+            throw new BadRequestException("No avatar received");
+        }
+
+        realtor.avatar = avatar.path;
+
+        realtor = await this.realtorRepository.save(realtor);
+
+        return {
+            status_code: 200,
+            message: "Avatar changed succesfully",
+            data: realtor
+        };
+    }
+
+    @Get(':id/avatar')
+    async getAvatar(@Param('id') realtorId: number, @Res() response) {
+        const realtor = await this.realtorRepository.findOne(realtorId);
+
+        if (realtor === undefined) {
+            throw new NotFoundException();
+        }
+
+        return response.sendFile(realtor.avatar, { root: './' });
     }
 
     @Put(':id')
