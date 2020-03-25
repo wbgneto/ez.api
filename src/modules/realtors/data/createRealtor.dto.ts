@@ -5,7 +5,6 @@ export class CreateRealtorDto {
     @IsNotEmpty()
     name: string;
 
-    @IsPhoneNumber("+1")
     @IsOptional()
     phone: string;
 

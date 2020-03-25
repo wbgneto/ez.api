@@ -15,6 +15,9 @@ export class Realtor {
     @Column({ nullable: true })
     phone: string;
 
+    @Column({ nullable: true })
+    avatar: string;
+
     @OneToMany(type => Listing, listing => listing.realtor)
     listings: Listing[];
 
