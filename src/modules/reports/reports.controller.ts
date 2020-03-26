@@ -288,7 +288,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -311,7 +311,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -334,7 +334,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3)+ ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].price
@@ -362,7 +362,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
@@ -385,7 +385,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
@@ -411,7 +411,7 @@ export class ReportsController {
                 let overallsale = [];
                 console.log(allsales);
                 for(let i=0; i< allsales.length; i++) {
-                    let label = allsales[i].month + ' ' + allsales[i].year;
+                    let label = (allsales[i].month).slice(0, 3) + ' ' + allsales[i].year;
                     overallsale.push({
                         label: label,
                         value: allsales[i].count
