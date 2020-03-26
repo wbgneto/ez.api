@@ -324,7 +324,7 @@ export class ReportsController {
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
-                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month", "ANY_VALUE(listing.realtor.id)"])
+                .select(["SUM(listing.price) AS price" ,"YEAR(listing.sold_at) AS year", "MONTHNAME(listing.sold_at) AS month"])
                 .from(Listing, "listing")
                 .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
