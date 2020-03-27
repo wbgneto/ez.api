@@ -30,7 +30,7 @@ export class ReportsController {
 
         if(display == "revenue") {
 
-            if(entityType == 'realtors'){
+            if(entityType == 'realtors'){// get revenue per realtor
                 
                 const realtor = await getConnection()
                             .createQueryBuilder()
@@ -71,7 +71,7 @@ export class ReportsController {
                 console.log("this is others"+ others);
                 return realtorlist;
            
-            } else if(entityType == 'houses') {
+            } else if(entityType == 'houses') { // get revenue per property type
         
                 const listings = await getRepository(Listing)
                             .createQueryBuilder()
@@ -137,7 +137,7 @@ export class ReportsController {
             
         } else if(display == "quantity") {
 
-            if(entityType == 'realtors'){
+            if(entityType == 'realtors'){ // get quantity per realtor
                 
                 const realtor = await getConnection()
                 .createQueryBuilder()
@@ -176,7 +176,7 @@ export class ReportsController {
                 }
                 return realtorlist;
            
-            } else if(entityType == 'houses') {
+            } else if(entityType == 'houses') { // get quantity per property type
         
                 const listings = await getRepository(Listing)
                 .createQueryBuilder()
@@ -274,7 +274,7 @@ export class ReportsController {
 
         if( display == 'revenue' ) {
 
-            if (entityType == null) {
+            if (entityType == null) { // get all revenues per month in last year
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
@@ -283,6 +283,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
     
                 let overallsale = [];
@@ -296,7 +298,7 @@ export class ReportsController {
                 }
                 return overallsale;
 
-            } else if ( entityType == 'houses' ) {
+            } else if ( entityType == 'houses' ) { // get revenue of property type per month in last year
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
@@ -305,6 +307,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.type IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
                 
                 console.log(allsales);
@@ -320,7 +324,7 @@ export class ReportsController {
                 console.log(overallsale);
                 return overallsale;
 
-            } else if (entityType == 'realtors') {
+            } else if (entityType == 'realtors') { // get revenue of realtors monthly for last year 
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
@@ -329,6 +333,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at > :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
     
                 let overallsale = [];
@@ -348,7 +354,7 @@ export class ReportsController {
 
         } else if ( display == 'quantity') {
 
-            if (entityType == null) {
+            if (entityType == null) { // get quantity of all sales in last year monthly
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
@@ -357,6 +363,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.sold_at > :oneyear", {oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
     
                 let overallsale = [];
@@ -370,7 +378,7 @@ export class ReportsController {
                 }
                 return overallsale;
 
-            } else if ( entityType == 'houses' ) {
+            } else if ( entityType == 'houses' ) { // get quantity sold per property type in last year monthly
 
                 const allsales = await getRepository(Listing)
                 .createQueryBuilder()
@@ -379,6 +387,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.type IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
                 
                 console.log(allsales);
@@ -394,7 +404,7 @@ export class ReportsController {
                 console.log(overallsale);
                 return overallsale;
 
-            } else if (entityType == 'realtors') {
+            } else if (entityType == 'realtors') { // get quantity sold by of realtors in last year monthly
 
 
                 const allsales = await getRepository(Listing)
@@ -404,6 +414,8 @@ export class ReportsController {
                 .where("listing.status='2' AND listing.realtor.id IN (:...rid) AND listing.sold_at> :oneyear", {rid:ids, oneyear: oneYearAgo})
                 .groupBy("year")
                 .addGroupBy("month")
+                .addOrderBy("year","ASC")
+                .addOrderBy("MONTH(listing.sold_at)","ASC")
                 .getRawMany();
                 console.log('--------------------------------------');
                 console.log(allsales);
