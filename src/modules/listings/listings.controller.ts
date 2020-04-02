@@ -91,7 +91,7 @@ export class ListingsController {
             const realtor = await this.realtorRepository.findOne(requestData.realtor);
 
             if (!realtor) {
-                throw new BadRequestException("Realtor doest not exists");
+                throw new BadRequestException("Realtor does not exists");
             }
 
             requestData.realtor = realtor;
@@ -180,6 +180,10 @@ export class ListingsController {
 
         if (listing === undefined) {
             throw new NotFoundException();
+        }
+
+        if (!requestData.realtor) {
+            requestData.realtor = null;
         }
 
         listing = await this.listingRepository.merge(listing, requestData);

@@ -17,4 +17,7 @@ export class UpdateListingDto {
     @ValidateNested()
     @Type(() => Address)
     address: Address;
+
+    @IsOptional()
+    realtor: any;
 }
