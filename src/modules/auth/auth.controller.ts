@@ -21,7 +21,13 @@ export class AuthController {
       throw new BadRequestException("Invalid credentials");
     }
 
-    return await this.authService.createToken(user);
+    const data = await this.authService.createToken(user);
+
+    return {
+      status_code: 200,
+      message: `Authenticated as ${data.user.name}, welcome!`,
+      data
+    };
   }
 
   @Post('signup')
